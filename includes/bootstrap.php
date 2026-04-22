@@ -11,9 +11,47 @@ define('DATA_PATH', BASE_PATH . '/data');
 define('UPLOAD_PATH', DATA_PATH . '/uploads');
 define('INCLUDES_PATH', __DIR__);
 
-if (!is_dir(DATA_PATH)) {
-    @mkdir(DATA_PATH, 0770, true);
+// ---------- Globales Error-Handling ----------
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+if (!is_dir(DATA_PATH)) { @mkdir(DATA_PATH, 0770, true); }
+ini_set('error_log', DATA_PATH . '/app-error.log');
+
+function _app_error_page(string $ref): void {
+    if (!headers_sent()) {
+        http_response_code(500);
+        header('Content-Type: text/html; charset=utf-8');
+    }
+    echo '<!doctype html><meta charset="utf-8"><title>Fehler</title>';
+    echo '<body style="font-family:system-ui;padding:2rem;max-width:40rem;margin:auto;color:#0f172a">';
+    echo '<h1>Es ist ein Fehler aufgetreten</h1>';
+    echo '<p>Bitte versuche es in wenigen Minuten erneut.</p>';
+    echo '<p style="color:#64748b;font-size:.9rem">Referenz: <code>' . htmlspecialchars($ref) . '</code><br>';
+    echo 'Details stehen in <code>data/app-error.log</code>.</p>';
+    echo '</body>';
 }
+
+set_exception_handler(function (Throwable $e): void {
+    $ref = substr(bin2hex(random_bytes(4)), 0, 8);
+    error_log("[$ref] Uncaught " . get_class($e) . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine() . "\n" . $e->getTraceAsString());
+    _app_error_page($ref);
+});
+
+set_error_handler(function (int $severity, string $message, string $file, int $line): bool {
+    if (!(error_reporting() & $severity)) return false;
+    throw new ErrorException($message, 0, $severity, $file, $line);
+});
+
+register_shutdown_function(function (): void {
+    $e = error_get_last();
+    if ($e && in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR], true)) {
+        $ref = substr(bin2hex(random_bytes(4)), 0, 8);
+        error_log("[$ref] Fatal: {$e['message']} @ {$e['file']}:{$e['line']}");
+        _app_error_page($ref);
+    }
+});
+
 if (!is_dir(UPLOAD_PATH)) {
     @mkdir(UPLOAD_PATH, 0770, true);
 }

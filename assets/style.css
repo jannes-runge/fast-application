@@ -190,3 +190,11 @@ code{background:#e2e8f0;padding:2px 6px;border-radius:4px;font-size:.9em}
 .btn:focus-visible,.field input:focus-visible,.field select:focus-visible,.field textarea:focus-visible{
   outline:3px solid color-mix(in srgb, var(--c-accent) 80%, transparent);outline-offset:2px;
 }
+
+/* Diagnose-Liste (install.php) */
+.diag{list-style:none;padding:0;margin:.4rem 0 1rem;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}
+.diag li{display:flex;align-items:center;gap:.7rem;padding:.55rem .9rem;border-bottom:1px solid #e2e8f0;font-size:.95rem}
+.diag li:last-child{border-bottom:none}
+.diag .diag-ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;font-weight:700;color:#fff;font-size:.85rem}
+.diag .ok .diag-ico{background:var(--c-success)}
+.diag .bad .diag-ico{background:var(--c-danger)}

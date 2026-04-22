@@ -16,6 +16,27 @@ $lockFile = BASE_PATH . '/.install-lock';
 $secretsFile = INCLUDES_PATH . '/secrets.php';
 $alreadyDone = file_exists($lockFile) && file_exists($secretsFile);
 
+// ---------- Umgebungs-Diagnose ----------
+$diag = [];
+$phpOK   = version_compare(PHP_VERSION, '8.1.0', '>=');
+$extOpenssl = extension_loaded('openssl');
+$extPdoSqlite = extension_loaded('pdo_sqlite');
+$extFileinfo = extension_loaded('fileinfo');
+$gcmOK = $extOpenssl && in_array('aes-256-gcm', array_map('strtolower', openssl_get_cipher_methods()), true);
+$dataWritable = is_writable(DATA_PATH);
+$incWritable = is_writable(INCLUDES_PATH);
+
+$diag = [
+    ['PHP ≥ 8.1',                    $phpOK,        'Aktuell: ' . PHP_VERSION],
+    ['Extension: openssl',           $extOpenssl,   $extOpenssl ? 'geladen' : 'fehlt'],
+    ['Extension: pdo_sqlite',        $extPdoSqlite, $extPdoSqlite ? 'geladen' : 'fehlt'],
+    ['Extension: fileinfo',          $extFileinfo,  $extFileinfo ? 'geladen' : 'fehlt'],
+    ['AES-256-GCM verfügbar',        $gcmOK,        $gcmOK ? 'ok' : 'nicht unterstützt'],
+    ['data/ beschreibbar',           $dataWritable, $dataWritable ? 'ok' : DATA_PATH . ' nicht schreibbar'],
+    ['includes/ beschreibbar',       $incWritable,  $incWritable ? 'ok' : INCLUDES_PATH . ' nicht schreibbar'],
+];
+$envOK = !in_array(false, array_column($diag, 1), true);
+
 $errors = [];
 $done = false;
 
@@ -101,10 +122,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyDone) {
     <?php else: ?>
       <p class="muted">Lege den ersten Admin-Account an. Es wird ein frischer AES-256-Schlüssel erzeugt und in
       <code>includes/secrets.php</code> gespeichert.</p>
+
+      <h3 style="margin-top:1.5rem">Umgebungscheck</h3>
+      <ul class="diag">
+        <?php foreach ($diag as [$label, $ok, $detail]): ?>
+          <li class="<?= $ok ? 'ok' : 'bad' ?>">
+            <span class="diag-ico"><?= $ok ? '✓' : '✗' ?></span>
+            <strong><?= e($label) ?></strong>
+            <span class="muted"> — <?= e($detail) ?></span>
+          </li>
+        <?php endforeach ?>
+      </ul>
+      <?php if (!$envOK): ?>
+        <div class="alert">Bitte zunächst die oben markierten Probleme beheben. Setup kann erst abgeschlossen werden, wenn alles grün ist.</div>
+      <?php endif ?>
+
       <?php if ($errors): ?>
         <div class="alert"><ul><?php foreach ($errors as $er): ?><li><?= e($er) ?></li><?php endforeach ?></ul></div>
       <?php endif ?>
-      <form method="post" autocomplete="off">
+      <form method="post" autocomplete="off" <?= $envOK ? '' : 'style="opacity:.5;pointer-events:none"' ?>>
         <label class="field"><span>Benutzername</span>
           <input type="text" name="username" required pattern="[A-Za-z0-9._\-]{3,32}" value="<?= e($_POST['username'] ?? '') ?>">
         </label>

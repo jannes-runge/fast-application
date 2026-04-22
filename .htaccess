@@ -1,35 +1,25 @@
-# --- Root .htaccess: sensible Pfade sperren + Security-Header ---
+# --- Root .htaccess ---
+# Hinweis: <Directory>-Blöcke sind in .htaccess NICHT erlaubt (führen zu 500).
 
-# Verzeichnislisting aus
 Options -Indexes
+AddDefaultCharset UTF-8
 
-# data/ und includes/ komplett sperren
+# data/ und includes/ per URL sperren
 RedirectMatch 404 (?i)^/(data|includes)(/|$)
 
-# Dotfiles und Lock-Datei sperren
-<FilesMatch "^\.|^\.install-lock$">
+# Dotfiles, Lock-Datei und .log nie ausliefern
+<FilesMatch "(^\.|\.log$)">
   Require all denied
 </FilesMatch>
 
-# .php außerhalb der App nicht ausliefern (z.B. secrets.php)
-<FilesMatch "secrets\.php$">
+# secrets.php doppelt absichern, falls mal irrtümlich im Root landet
+<FilesMatch "^secrets\.php$">
   Require all denied
 </FilesMatch>
 
-# Upload-Verzeichnis: kein direkter Aufruf
-RedirectMatch 404 (?i)^/data/uploads/.*\.bin$
-
-# PHP in uploads nicht ausführen (Defense-in-Depth)
-<Directory "data">
-  php_flag engine off
-</Directory>
-
-# Security-Header als Fallback (falls nicht via PHP gesetzt)
+# Security-Header (Fallback falls nicht via PHP gesetzt)
 <IfModule mod_headers.c>
   Header set X-Content-Type-Options "nosniff"
   Header set X-Frame-Options "DENY"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
-
-# Default Charset
-AddDefaultCharset UTF-8
