@@ -218,14 +218,13 @@ $title = cfg('app_name', 'Bewerbung');
 </style>
 </head>
 <body>
-<div class="hero">
+<header class="hero">
   <div class="hero-inner">
     <img class="logo" src="<?= e(cfg('logo_path')) ?>" alt="<?= e(cfg('company_name')) ?>">
     <h1 class="fade-in">Werde Teil von <span class="accent"><?= e(cfg('company_name')) ?></span></h1>
-    <p class="lead fade-in delay">Wir freuen uns auf deine Bewerbung. Füll einfach das Formular aus — wir melden uns schnell zurück.</p>
+    <p class="lead fade-in delay">Wir freuen uns auf deine Bewerbung. Fülle einfach das Formular aus — wir melden uns schnell zurück.</p>
   </div>
-  <div class="hero-wave" aria-hidden="true"></div>
-</div>
+</header>
 
 <main class="container">
   <?php if ($success): ?>

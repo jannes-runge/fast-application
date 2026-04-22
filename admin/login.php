@@ -49,12 +49,12 @@ $title = 'Admin-Login';
   }
 </style>
 </head>
-<body class="bg-gradient">
+<body class="bg-soft">
 <main class="container container-sm">
-  <div class="card form fade-in" style="margin-top:5rem">
+  <div class="card form fade-in centered-card">
     <img class="logo-sm" src="../<?= e(cfg('logo_path')) ?>" alt="">
-    <h2>Admin-Login</h2>
-    <p class="muted">Zugang nur für autorisiertes Personal.</p>
+    <h2 style="text-align:center">Admin-Login</h2>
+    <p class="muted" style="text-align:center">Zugang nur für autorisiertes Personal.</p>
     <?php if ($errors): ?>
       <div class="alert"><?= e(implode(' ', $errors)) ?></div>
     <?php endif ?>

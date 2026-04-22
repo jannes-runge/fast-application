@@ -14,16 +14,16 @@ return [
     'logo_path'     => 'assets/logo.svg',
 
     'colors' => [
-        'primary'    => '#4f46e5',
-        'primary_dk' => '#3730a3',
-        'accent'     => '#22d3ee',
-        'bg'         => '#0f172a',
-        'bg_soft'    => '#1e293b',
+        'primary'    => '#2563eb',
+        'primary_dk' => '#1d4ed8',
+        'accent'     => '#0ea5e9',
+        'bg'         => '#ffffff',
+        'bg_soft'    => '#f8fafc',
         'surface'    => '#ffffff',
         'text'       => '#0f172a',
-        'text_soft'  => '#475569',
-        'danger'     => '#ef4444',
-        'success'    => '#10b981',
+        'text_soft'  => '#64748b',
+        'danger'     => '#dc2626',
+        'success'    => '#059669',
     ],
 
     // ---------- Offene Positionen ----------

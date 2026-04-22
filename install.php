@@ -92,15 +92,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$alreadyDone) {
 <link rel="stylesheet" href="assets/style.css">
 <style>
   :root{
-    --c-primary:#4f46e5;--c-primary-dk:#3730a3;--c-accent:#22d3ee;
-    --c-bg:#0f172a;--c-bg-soft:#1e293b;--c-surface:#fff;
-    --c-text:#0f172a;--c-text-soft:#475569;--c-danger:#ef4444;--c-success:#10b981;
+    --c-primary:#2563eb;--c-primary-dk:#1d4ed8;--c-accent:#0ea5e9;
+    --c-bg:#ffffff;--c-bg-soft:#f8fafc;--c-surface:#ffffff;
+    --c-text:#0f172a;--c-text-soft:#64748b;--c-danger:#dc2626;--c-success:#059669;
   }
 </style>
 </head>
-<body class="bg-gradient">
+<body class="bg-soft">
 <main class="container container-sm">
-  <div class="card form fade-in" style="margin-top:4rem">
+  <div class="card form fade-in centered-card">
     <h2>Erstinstallation</h2>
     <?php if ($alreadyDone): ?>
       <div class="alert alert-success">
