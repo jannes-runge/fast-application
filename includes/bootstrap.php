@@ -62,7 +62,27 @@ if (!file_exists($dataHt)) {
     @file_put_contents($dataHt, "Require all denied\nDeny from all\n");
 }
 
-$CONFIG = require INCLUDES_PATH . '/config.php';
+// ---------- Konfiguration laden ----------
+// includes/config.default.php = Template (im git getracked).
+// includes/config.php         = Live-Konfig auf dem Server (ge-gitignored).
+// Pull/Push überschreibt damit niemals die User-Anpassungen.
+$configDefault = INCLUDES_PATH . '/config.default.php';
+$configLive    = INCLUDES_PATH . '/config.php';
+if (!file_exists($configLive) && file_exists($configDefault)) {
+    @copy($configDefault, $configLive);
+    @chmod($configLive, 0640);
+}
+$defaults = file_exists($configDefault) ? require $configDefault : [];
+$user     = file_exists($configLive)    ? require $configLive    : [];
+$CONFIG   = array_replace_recursive(is_array($defaults) ? $defaults : [],
+                                    is_array($user)     ? $user     : []);
+
+// Logo-Auto-Seed: liefert assets/logo.svg aus, falls der User noch keins abgelegt hat.
+$logoLive    = BASE_PATH . '/assets/logo.svg';
+$logoDefault = BASE_PATH . '/assets/logo.default.svg';
+if (!file_exists($logoLive) && file_exists($logoDefault)) {
+    @copy($logoDefault, $logoLive);
+}
 
 $secretsFile = INCLUDES_PATH . '/secrets.php';
 $SECRETS = file_exists($secretsFile) ? require $secretsFile : null;
@@ -126,6 +146,7 @@ require_once INCLUDES_PATH . '/crypto.php';
 require_once INCLUDES_PATH . '/db.php';
 require_once INCLUDES_PATH . '/auth.php';
 require_once INCLUDES_PATH . '/mailer.php';
+require_once INCLUDES_PATH . '/mailtemplates.php';
 
 /**
  * HTML-Escape Shortcut.

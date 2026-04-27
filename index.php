@@ -121,16 +121,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // E-Mail an Bewerber
             $companyName = cfg('company_name', '');
-            $contactMail = cfg('contact_email', '');
-            $contactPhone = cfg('contact_phone', '');
-            $applicantHtml = render_applicant_mail($firstName, $position, $companyName, $contactMail, $contactPhone);
-            Mailer::send([$email], 'Deine Bewerbung bei ' . $companyName, $applicantHtml);
+            Mailer::send([$email],
+                'Deine Bewerbung bei ' . $companyName,
+                mail_applicant_confirm($firstName, $position));
 
             // Admin-Mail
             $admins = cfg('admin_notify_emails', []);
             if ($admins) {
-                $adminHtml = render_admin_mail($firstName, $lastName, $email, $phone, $position, $message, count($attachmentsMeta));
-                Mailer::send($admins, '[Bewerbung] ' . $firstName . ' ' . $lastName . ' – ' . $position, $adminHtml);
+                Mailer::send($admins,
+                    '[Bewerbung] ' . $firstName . ' ' . $lastName . ' – ' . $position,
+                    mail_admin_new_application($firstName, $lastName, $email, $phone, $position, $message, count($attachmentsMeta)));
             }
 
             unset($_SESSION['form_ts']);
@@ -141,56 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Interner Fehler beim Speichern. Bitte später erneut versuchen.';
         }
     }
-}
-
-function render_applicant_mail(string $firstName, string $position, string $company, string $mail, string $phone): string {
-    $fn = e($firstName); $pos = e($position); $co = e($company); $m = e($mail); $ph = e($phone);
-    $logo = e(cfg('company_name', ''));
-    $primary = e(cfg('colors.primary', '#4f46e5'));
-    return <<<HTML
-    <div style="font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;background:#f1f5f9;padding:24px">
-      <div style="max-width:560px;margin:auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.06)">
-        <div style="background:{$primary};color:#fff;padding:28px 28px 20px 28px">
-          <div style="font-size:20px;font-weight:700">{$logo}</div>
-        </div>
-        <div style="padding:28px;color:#0f172a;line-height:1.55">
-          <h1 style="margin:0 0 12px;font-size:22px">Danke, {$fn}!</h1>
-          <p>Wir haben deine Bewerbung für die Position <strong>{$pos}</strong> erhalten.</p>
-          <p>Unser Team schaut sich deine Unterlagen sorgfältig an und meldet sich zeitnah bei dir zurück.</p>
-          <p>Solltest du Fragen haben, erreichst du uns jederzeit unter
-             <a href="mailto:{$m}" style="color:{$primary}">{$m}</a>
-             oder telefonisch unter {$ph}.</p>
-          <p style="margin-top:28px">Herzliche Grüße<br>dein Team von {$co}</p>
-        </div>
-        <div style="background:#f8fafc;padding:14px 28px;color:#64748b;font-size:12px">
-          Diese Nachricht wurde automatisch generiert.
-        </div>
-      </div>
-    </div>
-    HTML;
-}
-
-function render_admin_mail(string $fn, string $ln, string $mail, string $phone, string $pos, string $msg, int $fileCount): string {
-    $fn=e($fn); $ln=e($ln); $mail=e($mail); $phone=e($phone ?: '–'); $pos=e($pos);
-    $msg=nl2br(e($msg));
-    $primary = e(cfg('colors.primary', '#4f46e5'));
-    return <<<HTML
-    <div style="font-family:system-ui,Segoe UI,Helvetica,Arial,sans-serif;background:#f1f5f9;padding:24px">
-      <div style="max-width:620px;margin:auto;background:#fff;border-radius:14px;overflow:hidden">
-        <div style="background:{$primary};color:#fff;padding:20px 24px;font-weight:700;font-size:18px">Neue Bewerbung</div>
-        <div style="padding:24px;color:#0f172a;line-height:1.55">
-          <p><strong>Name:</strong> {$fn} {$ln}<br>
-             <strong>E-Mail:</strong> <a href="mailto:{$mail}">{$mail}</a><br>
-             <strong>Telefon:</strong> {$phone}<br>
-             <strong>Position:</strong> {$pos}<br>
-             <strong>Anhänge:</strong> {$fileCount}</p>
-          <hr style="border:none;border-top:1px solid #e2e8f0;margin:18px 0">
-          <p style="white-space:pre-wrap">{$msg}</p>
-          <p style="margin-top:24px;color:#64748b;font-size:13px">Details und Anhänge im Admin-Bereich.</p>
-        </div>
-      </div>
-    </div>
-    HTML;
 }
 
 $title = cfg('app_name', 'Bewerbung');

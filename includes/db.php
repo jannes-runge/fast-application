@@ -65,5 +65,30 @@ final class DB {
             );
             CREATE INDEX IF NOT EXISTS idx_la ON login_attempts(ip_hash, created_at);
         SQL);
+
+        // Inkrementelle Migrationen
+        $cols = self::$pdo->query("PRAGMA table_info(applications)")->fetchAll();
+        $names = array_column($cols, 'name');
+        if (!in_array('status', $names, true)) {
+            self::$pdo->exec("ALTER TABLE applications ADD COLUMN status TEXT NOT NULL DEFAULT 'new'");
+        }
+        if (!in_array('status_changed_at', $names, true)) {
+            self::$pdo->exec("ALTER TABLE applications ADD COLUMN status_changed_at INTEGER");
+        }
     }
+}
+
+/**
+ * Erlaubte Bewerbungs-Status mit deutschem Label und Badge-Klasse.
+ */
+final class AppStatus {
+    public const ALL = [
+        'new'       => ['label' => 'Neu',          'class' => 'st-new'],
+        'contacted' => ['label' => 'Kontaktiert',  'class' => 'st-contacted'],
+        'accepted'  => ['label' => 'Angenommen',   'class' => 'st-accepted'],
+        'rejected'  => ['label' => 'Abgelehnt',    'class' => 'st-rejected'],
+    ];
+    public static function isValid(string $s): bool { return isset(self::ALL[$s]); }
+    public static function label(string $s): string { return self::ALL[$s]['label'] ?? $s; }
+    public static function cssClass(string $s): string { return self::ALL[$s]['class'] ?? ''; }
 }

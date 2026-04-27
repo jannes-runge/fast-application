@@ -32,6 +32,9 @@ try {
     echo 'Fehler beim Entschlüsseln: ' . e($e->getMessage());
     exit;
 }
+
+$status = (string)($row['status'] ?? 'new');
+$statusChanged = (int)($row['status_changed_at'] ?? 0);
 ?><!doctype html>
 <html lang="de">
 <head>
@@ -62,6 +65,7 @@ try {
     <strong><?= e(cfg('company_name')) ?> · Admin</strong>
     <span class="spacer"></span>
     <a class="btn btn-ghost btn-sm" href="index.php">← Zurück</a>
+    <a class="btn btn-ghost btn-sm" href="admins.php">Admins</a>
     <a class="btn btn-ghost btn-sm" href="logout.php">Abmelden</a>
   </div>
 </header>
@@ -69,12 +73,42 @@ try {
 <main class="container">
   <div class="card">
     <p class="muted">Eingegangen am <?= e(date('d.m.Y H:i', (int)$row['created_at'])) ?></p>
-    <h1><?= e($data['first'] . ' ' . $data['last']) ?></h1>
+    <h1 style="margin-bottom:.3rem"><?= e($data['first'] . ' ' . $data['last']) ?></h1>
+    <p style="margin-top:0">
+      <span class="status-badge <?= e(AppStatus::cssClass($status)) ?>"><?= e(AppStatus::label($status)) ?></span>
+      <?php if ($statusChanged > 0): ?>
+        <span class="muted" style="font-size:.85rem">geändert am <?= e(date('d.m.Y H:i', $statusChanged)) ?></span>
+      <?php endif ?>
+    </p>
     <p>
       <strong>E-Mail:</strong> <a href="mailto:<?= e($data['email']) ?>"><?= e($data['email']) ?></a><br>
       <strong>Telefon:</strong> <?= $data['phone'] !== '' ? e($data['phone']) : '<span class="muted">–</span>' ?><br>
       <strong>Position:</strong> <?= e($data['position']) ?>
     </p>
+
+    <h2>Status ändern</h2>
+    <div class="status-actions">
+      <?php
+        $actions = [
+          ['contacted', 'Als kontaktiert markieren', 'btn-ghost', null],
+          ['accepted',  'Annehmen',                  'btn-success',
+              'Bewerbung von ' . $data['first'] . ' ' . $data['last'] . ' wirklich annehmen?\nEs wird eine Bestätigungsmail an den Bewerber gesendet.'],
+          ['rejected',  'Ablehnen',                  'btn-danger',
+              'Bewerbung von ' . $data['first'] . ' ' . $data['last'] . ' wirklich ablehnen?\nEs wird eine Absagemail an den Bewerber gesendet.'],
+          ['new',       'Auf "Neu" zurücksetzen',    'btn-ghost', null],
+        ];
+        foreach ($actions as [$nextStatus, $label, $cls, $confirm]):
+          if ($nextStatus === $status) continue;
+      ?>
+        <form method="post" action="status.php"
+              <?= $confirm !== null ? 'onsubmit="return confirm(' . htmlspecialchars(json_encode($confirm), ENT_QUOTES) . ')"' : '' ?>>
+          <?= Auth::csrfField() ?>
+          <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
+          <input type="hidden" name="status" value="<?= e($nextStatus) ?>">
+          <button class="btn btn-sm <?= e($cls) ?>" type="submit"><?= e($label) ?></button>
+        </form>
+      <?php endforeach ?>
+    </div>
 
     <h2>Anschreiben</h2>
     <div class="message-box"><?= nl2br(e($data['message'])) ?></div>

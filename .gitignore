@@ -3,7 +3,10 @@
 /data/app.db-wal
 /data/app.db-shm
 /data/uploads/
+/data/app-error.log
 /includes/secrets.php
+/includes/config.php
+/assets/logo.svg
 /.install-lock
 .DS_Store
 *.log
