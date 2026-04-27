@@ -35,6 +35,7 @@ foreach ($rows as $r) {
 <title>Admin · Bewerbungen</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="stylesheet" href="../assets/style.css">
 <style>
   :root{
@@ -52,16 +53,7 @@ foreach ($rows as $r) {
 </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <img class="logo-sm" src="../<?= e(cfg('logo_path')) ?>" alt="">
-    <strong><?= e(cfg('company_name')) ?> · Admin</strong>
-    <span class="spacer"></span>
-    <a class="btn btn-ghost btn-sm" href="admins.php">Admins</a>
-    <span class="muted">Hallo, <?= e($_SESSION['admin_user'] ?? '') ?></span>
-    <a class="btn btn-ghost btn-sm" href="logout.php">Abmelden</a>
-  </div>
-</header>
+<?php $nav = 'apps'; include __DIR__ . '/_topbar.php'; ?>
 
 <main class="container container-wide">
   <div class="page-header">
@@ -83,7 +75,7 @@ foreach ($rows as $r) {
     <div class="card"><p class="muted">Noch keine Bewerbungen eingegangen.</p></div>
   <?php else: ?>
     <div class="card table-wrap" id="appList">
-      <table class="tbl tbl-cards">
+      <table class="tbl tbl-cards tbl-apps">
         <thead>
           <tr>
             <th>Eingang</th>
@@ -97,20 +89,22 @@ foreach ($rows as $r) {
         </thead>
         <tbody>
         <?php foreach ($apps as $a): ?>
-          <tr data-search="<?= e(strtolower($a['first'].' '.$a['last'].' '.$a['email'].' '.$a['position'])) ?>"
-              data-status="<?= e($a['status']) ?>">
-            <td data-label="Eingang"><?= e(date('d.m.Y H:i', $a['created'])) ?></td>
-            <td data-label="Name"><strong><?= e($a['first'] . ' ' . $a['last']) ?></strong></td>
-            <td data-label="E-Mail"><a href="mailto:<?= e($a['email']) ?>"><?= e($a['email']) ?></a></td>
-            <td data-label="Position"><?= e($a['position']) ?></td>
-            <td data-label="Status"><span class="status-badge <?= e(AppStatus::cssClass($a['status'])) ?>"><?= e(AppStatus::label($a['status'])) ?></span></td>
-            <td data-label="Anhänge"><?= $a['att_count'] ?></td>
-            <td data-label=""><a class="btn btn-sm btn-primary" href="view.php?id=<?= $a['id'] ?>">Öffnen</a></td>
+          <?php $search = mb_strtolower($a['first'].' '.$a['last'].' '.$a['email'].' '.$a['position'], 'UTF-8'); ?>
+          <tr data-search="<?= e($search) ?>"
+              data-status="<?= e($a['status']) ?>"
+              data-href="view.php?id=<?= $a['id'] ?>">
+            <td data-col="date" data-label="Eingang"><?= e(date('d.m.Y H:i', $a['created'])) ?></td>
+            <td data-col="name" data-label="Name"><strong><?= e($a['first'] . ' ' . $a['last']) ?></strong></td>
+            <td data-col="email" data-label="E-Mail"><a href="mailto:<?= e($a['email']) ?>"><?= e($a['email']) ?></a></td>
+            <td data-col="position" data-label="Position"><?= e($a['position']) ?></td>
+            <td data-col="status" data-label="Status"><span class="status-badge <?= e(AppStatus::cssClass($a['status'])) ?>"><?= e(AppStatus::label($a['status'])) ?></span></td>
+            <td data-col="att" data-label="Anhänge"><?= $a['att_count'] ?></td>
+            <td data-col="action" data-label=""><a class="btn btn-sm btn-primary" href="view.php?id=<?= $a['id'] ?>">Öffnen</a></td>
           </tr>
         <?php endforeach ?>
         </tbody>
       </table>
-      <p class="muted empty-hint" id="emptyHint" hidden>Keine Treffer.</p>
+      <p class="muted empty-hint row-hidden" id="emptyHint">Keine Treffer.</p>
     </div>
   <?php endif ?>
 </main>
@@ -120,24 +114,35 @@ foreach ($rows as $r) {
   const q  = document.getElementById('filter');
   const fs = document.getElementById('filterStatus');
   const list = document.getElementById('appList');
-  if (!q || !list) return;
-  const rows = list.querySelectorAll('tbody tr');
+  if (!q || !fs || !list) return;
+  const rows  = list.querySelectorAll('tbody tr');
   const empty = document.getElementById('emptyHint');
+
   const apply = () => {
-    const term = q.value.trim().toLowerCase();
+    const term   = q.value.trim().toLowerCase();
     const status = fs.value;
     let visible = 0;
     rows.forEach(r => {
-      const matchesText = !term || r.dataset.search.includes(term);
-      const matchesStatus = !status || r.dataset.status === status;
-      const show = matchesText && matchesStatus;
-      r.hidden = !show;
-      if (show) visible++;
+      const text  = (r.dataset.search || '');
+      const match = (!term || text.includes(term))
+                 && (!status || r.dataset.status === status);
+      r.classList.toggle('row-hidden', !match);
+      if (match) visible++;
     });
-    if (empty) empty.hidden = visible !== 0;
+    if (empty) empty.classList.toggle('row-hidden', visible !== 0);
   };
   q.addEventListener('input', apply);
   fs.addEventListener('change', apply);
+
+  // Ganze Zeile klickbar (außer auf inneren Links/Buttons)
+  rows.forEach(r => {
+    const href = r.dataset.href;
+    if (!href) return;
+    r.addEventListener('click', e => {
+      if (e.target.closest('a, button, form')) return;
+      window.location = href;
+    });
+  });
 })();
 </script>
 </body>

@@ -58,6 +58,7 @@ $admins = $pdo->query('SELECT id, username, created_at FROM admins ORDER BY crea
 <title>Admin-Verwaltung</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="stylesheet" href="../assets/style.css">
 <style>
   :root{
@@ -75,16 +76,7 @@ $admins = $pdo->query('SELECT id, username, created_at FROM admins ORDER BY crea
 </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <img class="logo-sm" src="../<?= e(cfg('logo_path')) ?>" alt="">
-    <strong><?= e(cfg('company_name')) ?> · Admin</strong>
-    <span class="spacer"></span>
-    <a class="btn btn-ghost btn-sm" href="index.php">← Bewerbungen</a>
-    <span class="muted">Hallo, <?= e($_SESSION['admin_user'] ?? '') ?></span>
-    <a class="btn btn-ghost btn-sm" href="logout.php">Abmelden</a>
-  </div>
-</header>
+<?php $nav = 'admins'; include __DIR__ . '/_topbar.php'; ?>
 
 <main class="container container-wide">
   <h1>Admin-Verwaltung</h1>
@@ -95,7 +87,7 @@ $admins = $pdo->query('SELECT id, username, created_at FROM admins ORDER BY crea
   <?php endif ?>
 
   <div class="card table-wrap" style="margin-bottom:1.5rem">
-    <table class="tbl tbl-cards">
+    <table class="tbl tbl-cards tbl-admins">
       <thead><tr><th>Benutzername</th><th>Angelegt am</th><th></th></tr></thead>
       <tbody>
         <?php foreach ($admins as $a): ?>

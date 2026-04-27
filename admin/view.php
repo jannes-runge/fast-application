@@ -42,6 +42,7 @@ $statusChanged = (int)($row['status_changed_at'] ?? 0);
 <title>Bewerbung <?= e($data['first'] . ' ' . $data['last']) ?></title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <link rel="stylesheet" href="../assets/style.css">
 <style>
   :root{
@@ -59,32 +60,30 @@ $statusChanged = (int)($row['status_changed_at'] ?? 0);
 </style>
 </head>
 <body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <img class="logo-sm" src="../<?= e(cfg('logo_path')) ?>" alt="">
-    <strong><?= e(cfg('company_name')) ?> · Admin</strong>
-    <span class="spacer"></span>
-    <a class="btn btn-ghost btn-sm" href="index.php">← Zurück</a>
-    <a class="btn btn-ghost btn-sm" href="admins.php">Admins</a>
-    <a class="btn btn-ghost btn-sm" href="logout.php">Abmelden</a>
-  </div>
-</header>
+<?php $nav = 'apps'; include __DIR__ . '/_topbar.php'; ?>
 
 <main class="container container-wide">
-  <div class="card">
-    <p class="muted">Eingegangen am <?= e(date('d.m.Y H:i', (int)$row['created_at'])) ?></p>
-    <h1 style="margin-bottom:.3rem"><?= e($data['first'] . ' ' . $data['last']) ?></h1>
-    <p style="margin-top:0">
-      <span class="status-badge <?= e(AppStatus::cssClass($status)) ?>"><?= e(AppStatus::label($status)) ?></span>
-      <?php if ($statusChanged > 0): ?>
-        <span class="muted" style="font-size:.85rem">geändert am <?= e(date('d.m.Y H:i', $statusChanged)) ?></span>
-      <?php endif ?>
-    </p>
-    <p>
-      <strong>E-Mail:</strong> <a href="mailto:<?= e($data['email']) ?>"><?= e($data['email']) ?></a><br>
-      <strong>Telefon:</strong> <?= $data['phone'] !== '' ? e($data['phone']) : '<span class="muted">–</span>' ?><br>
-      <strong>Position:</strong> <?= e($data['position']) ?>
-    </p>
+  <p class="breadcrumb"><a href="index.php">← Bewerbungen</a></p>
+
+  <div class="card detail-view">
+    <header class="detail-head">
+      <div>
+        <h1><?= e($data['first'] . ' ' . $data['last']) ?></h1>
+        <p class="muted">Eingegangen am <?= e(date('d.m.Y H:i', (int)$row['created_at'])) ?></p>
+      </div>
+      <div class="detail-status">
+        <span class="status-badge <?= e(AppStatus::cssClass($status)) ?>"><?= e(AppStatus::label($status)) ?></span>
+        <?php if ($statusChanged > 0): ?>
+          <small class="muted">geändert <?= e(date('d.m.Y H:i', $statusChanged)) ?></small>
+        <?php endif ?>
+      </div>
+    </header>
+
+    <dl class="meta">
+      <div><dt>E-Mail</dt><dd><a href="mailto:<?= e($data['email']) ?>"><?= e($data['email']) ?></a></dd></div>
+      <div><dt>Telefon</dt><dd><?= $data['phone'] !== '' ? e($data['phone']) : '<span class="muted">–</span>' ?></dd></div>
+      <div><dt>Position</dt><dd><?= e($data['position']) ?></dd></div>
+    </dl>
 
     <h2>Status ändern</h2>
     <div class="status-actions">
