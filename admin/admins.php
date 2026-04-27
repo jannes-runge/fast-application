@@ -101,7 +101,7 @@ $admins = $pdo->query('SELECT id, username, created_at FROM admins ORDER BY crea
             <td data-label="Angelegt"><?= e(date('d.m.Y', (int)$a['created_at'])) ?></td>
             <td data-label="">
               <?php if ((int)$a['id'] !== (int)($_SESSION['admin_id'] ?? 0) && count($admins) > 1): ?>
-                <form method="post" onsubmit="return confirm('Admin <?= e($a['username']) ?> wirklich löschen?')">
+                <form method="post" data-confirm="Admin <?= e($a['username']) ?> wirklich löschen?">
                   <?= Auth::csrfField() ?>
                   <input type="hidden" name="action" value="delete">
                   <input type="hidden" name="id" value="<?= (int)$a['id'] ?>">
@@ -142,5 +142,6 @@ $admins = $pdo->query('SELECT id, username, created_at FROM admins ORDER BY crea
     </form>
   </div>
 </main>
+<script src="../assets/admin.js" defer></script>
 </body>
 </html>

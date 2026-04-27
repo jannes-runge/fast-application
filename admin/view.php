@@ -100,7 +100,7 @@ $statusChanged = (int)($row['status_changed_at'] ?? 0);
           if ($nextStatus === $status) continue;
       ?>
         <form method="post" action="status.php"
-              <?= $confirm !== null ? 'onsubmit="return confirm(' . htmlspecialchars(json_encode($confirm), ENT_QUOTES) . ')"' : '' ?>>
+              <?= $confirm !== null ? 'data-confirm="' . e($confirm) . '"' : '' ?>>
           <?= Auth::csrfField() ?>
           <input type="hidden" name="id" value="<?= (int)$row['id'] ?>">
           <input type="hidden" name="status" value="<?= e($nextStatus) ?>">
@@ -128,5 +128,6 @@ $statusChanged = (int)($row['status_changed_at'] ?? 0);
     <?php endif ?>
   </div>
 </main>
+<script src="../assets/admin.js" defer></script>
 </body>
 </html>
