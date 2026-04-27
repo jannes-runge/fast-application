@@ -70,7 +70,7 @@ $statusChanged = (int)($row['status_changed_at'] ?? 0);
   </div>
 </header>
 
-<main class="container">
+<main class="container container-wide">
   <div class="card">
     <p class="muted">Eingegangen am <?= e(date('d.m.Y H:i', (int)$row['created_at'])) ?></p>
     <h1 style="margin-bottom:.3rem"><?= e($data['first'] . ' ' . $data['last']) ?></h1>

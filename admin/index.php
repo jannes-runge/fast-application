@@ -63,7 +63,7 @@ foreach ($rows as $r) {
   </div>
 </header>
 
-<main class="container">
+<main class="container container-wide">
   <div class="page-header">
     <h1>Bewerbungen <span class="badge"><?= count($apps) ?></span></h1>
     <?php if ($apps): ?>

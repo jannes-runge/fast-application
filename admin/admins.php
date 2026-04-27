@@ -86,7 +86,7 @@ $admins = $pdo->query('SELECT id, username, created_at FROM admins ORDER BY crea
   </div>
 </header>
 
-<main class="container">
+<main class="container container-wide">
   <h1>Admin-Verwaltung</h1>
 
   <?php if ($notice): ?><div class="alert alert-success"><?= e($notice) ?></div><?php endif ?>

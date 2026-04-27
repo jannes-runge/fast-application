@@ -25,6 +25,7 @@ code{background:var(--c-bg-soft);padding:2px 6px;border-radius:4px;font-size:.9e
 /* ---------- Layout ---------- */
 .container{max-width:860px;margin:0 auto;padding:0 1.25rem 4rem}
 .container-sm{max-width:460px}
+.container-wide{max-width:1280px}
 .card{
   background:var(--c-surface);
   border:1px solid #e5e7eb;
@@ -77,7 +78,7 @@ code{background:var(--c-bg-soft);padding:2px 6px;border-radius:4px;font-size:.9e
 }
 .topbar-inner{
   display:flex;align-items:center;gap:.6rem;
-  max-width:1100px;margin:auto;flex-wrap:wrap;
+  max-width:1280px;margin:auto;flex-wrap:wrap;
 }
 .topbar a{color:inherit}
 .topbar .spacer{flex:1;min-width:0}
@@ -192,9 +193,11 @@ code{background:var(--c-bg-soft);padding:2px 6px;border-radius:4px;font-size:.9e
 
 /* ---------- Table ---------- */
 .table-wrap{padding:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th,.tbl td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid #e5e7eb;vertical-align:middle}
-.tbl th{background:var(--c-bg-soft);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--c-text-soft);font-weight:600}
+.tbl{width:100%;border-collapse:collapse;table-layout:auto}
+.tbl th,.tbl td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid #e5e7eb;vertical-align:middle;overflow-wrap:anywhere}
+.tbl th{background:var(--c-bg-soft);font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--c-text-soft);font-weight:600;white-space:nowrap}
+.tbl td a{overflow-wrap:anywhere}
+.tbl td:last-child{white-space:nowrap;text-align:right}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr:hover td{background:#fafafa}
 .badge{
