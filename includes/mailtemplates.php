@@ -39,9 +39,28 @@ function mail_applicant_confirm(string $firstName, string $position): string {
         HTML);
 }
 
-function mail_admin_new_application(string $fn, string $ln, string $mail, string $phone, string $pos, string $msg, int $fileCount): string {
+function mail_admin_new_application(string $fn, string $ln, string $mail, string $phone, string $pos, string $msg, int $fileCount, ?string $viewUrl = null): string {
     $fn=e($fn); $ln=e($ln); $mail=e($mail); $phone=e($phone !== '' ? $phone : '–'); $pos=e($pos);
     $msg=nl2br(e($msg));
+    $primary = e(cfg('colors.primary', '#2563eb'));
+
+    $cta = '';
+    if ($viewUrl) {
+        $u = e($viewUrl);
+        $cta = <<<HTML
+        <p style="text-align:center;margin:26px 0 6px">
+          <a href="{$u}"
+             style="display:inline-block;background:{$primary};color:#fff;text-decoration:none;
+                    padding:12px 22px;border-radius:8px;font-weight:600;font-size:15px">
+            Bewerbung ansehen
+          </a>
+        </p>
+        <p style="text-align:center;color:#64748b;font-size:12px;margin:0 0 8px">
+          Du wirst ggf. zum Login geleitet und danach automatisch weitergeleitet.
+        </p>
+        HTML;
+    }
+
     return mail_layout('Neue Bewerbung', <<<HTML
         <h1 style="margin:0 0 12px;font-size:20px">Neue Bewerbung eingegangen</h1>
         <p><strong>Name:</strong> {$fn} {$ln}<br>
@@ -51,7 +70,7 @@ function mail_admin_new_application(string $fn, string $ln, string $mail, string
            <strong>Anhänge:</strong> {$fileCount}</p>
         <hr style="border:none;border-top:1px solid #e5e7eb;margin:18px 0">
         <p style="white-space:pre-wrap">{$msg}</p>
-        <p style="margin-top:24px;color:#64748b;font-size:13px">Details und Anhänge im Admin-Bereich.</p>
+        {$cta}
         HTML);
 }
 

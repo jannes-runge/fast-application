@@ -168,3 +168,19 @@ function cfg(string $path, $default = null) {
     }
     return $ref;
 }
+
+/**
+ * Baut absolute URLs für Mails / externe Links.
+ * Nutzt public_url aus der Config, fällt sonst auf Host/Scheme aus dem Request zurück.
+ */
+function public_url(string $relativePath = ''): string {
+    $base = (string)cfg('public_url', '');
+    if ($base === '') {
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $base   = $scheme . '://' . $host;
+    }
+    $base = rtrim($base, '/');
+    $rel  = ltrim($relativePath, '/');
+    return $rel === '' ? $base : ($base . '/' . $rel);
+}

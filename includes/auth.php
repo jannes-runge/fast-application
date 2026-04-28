@@ -58,9 +58,26 @@ final class Auth {
 
     public static function require(): void {
         if (!self::isLoggedIn()) {
-            header('Location: login.php');
+            $url = 'login.php';
+            $next = $_SERVER['REQUEST_URI'] ?? '';
+            if (self::isSafeNext($next)) {
+                $url .= '?next=' . urlencode($next);
+            }
+            header('Location: ' . $url);
             exit;
         }
+    }
+
+    /**
+     * Prüft, ob ein Redirect-Ziel als sicher (rein interne, relative URL) gelten kann.
+     * Verhindert Open-Redirects auf externe Hosts.
+     */
+    public static function isSafeNext(?string $next): bool {
+        if ($next === null || $next === '')   return false;
+        if ($next[0] !== '/')                 return false; // muss absolut-relativ sein
+        if (str_starts_with($next, '//'))     return false; // protokoll-relativ → extern
+        if (str_contains($next, '\\'))        return false; // Backslash-Tricks
+        return true;
     }
 
     /* ---------------- Lockout / Bruteforce ---------------- */

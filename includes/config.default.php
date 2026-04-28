@@ -13,6 +13,10 @@ return [
     'contact_phone' => '+49 30 12345678',
     'logo_path'     => 'assets/logo.svg',
 
+    // Wenn leer, wird die URL aus dem Request abgeleitet. Setzen, wenn die Anwendung
+    // hinter einem Reverse-Proxy/CDN läuft, damit Mail-Links korrekt sind.
+    'public_url'    => '',
+
     'colors' => [
         'primary'    => '#2563eb',
         'primary_dk' => '#1d4ed8',

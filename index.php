@@ -118,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $attachmentsMeta ? Crypto::encrypt(json_encode($attachmentsMeta, JSON_UNESCAPED_UNICODE)) : null,
                 Auth::ipHash(),
             ]);
+            $appId = (int)$pdo->lastInsertId();
 
             // E-Mail an Bewerber
             $companyName = cfg('company_name', '');
@@ -128,9 +129,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Admin-Mail
             $admins = cfg('admin_notify_emails', []);
             if ($admins) {
+                $viewUrl = public_url('admin/view.php?id=' . $appId);
                 Mailer::send($admins,
                     '[Bewerbung] ' . $firstName . ' ' . $lastName . ' – ' . $position,
-                    mail_admin_new_application($firstName, $lastName, $email, $phone, $position, $message, count($attachmentsMeta)));
+                    mail_admin_new_application($firstName, $lastName, $email, $phone, $position, $message, count($attachmentsMeta), $viewUrl));
             }
 
             unset($_SESSION['form_ts']);

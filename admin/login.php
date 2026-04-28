@@ -3,8 +3,12 @@ declare(strict_types=1);
 require __DIR__ . '/../includes/bootstrap.php';
 
 $errors = [];
+$next = (string)($_GET['next'] ?? $_POST['next'] ?? '');
+if (!Auth::isSafeNext($next)) $next = '';
+$redirectAfterLogin = $next !== '' ? $next : 'index.php';
+
 if (Auth::isLoggedIn()) {
-    header('Location: index.php');
+    header('Location: ' . $redirectAfterLogin);
     exit;
 }
 
@@ -17,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $u = trim((string)($_POST['username'] ?? ''));
         $p = (string)($_POST['password'] ?? '');
         if (Auth::login($u, $p)) {
-            header('Location: index.php');
+            header('Location: ' . $redirectAfterLogin);
             exit;
         }
         $errors[] = 'Login fehlgeschlagen.';
@@ -61,6 +65,9 @@ $title = 'Admin-Login';
     <?php endif ?>
     <form method="post" autocomplete="off">
       <?= Auth::csrfField() ?>
+      <?php if ($next !== ''): ?>
+        <input type="hidden" name="next" value="<?= e($next) ?>">
+      <?php endif ?>
       <label class="field">
         <span>Benutzername</span>
         <input type="text" name="username" required autofocus>
