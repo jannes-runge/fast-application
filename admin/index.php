@@ -4,7 +4,10 @@ require __DIR__ . '/../includes/bootstrap.php';
 Auth::require();
 
 $pdo = DB::conn();
-$rows = $pdo->query('SELECT id, created_at, status, first_name_enc, last_name_enc, email_enc, position_enc, attachments_enc FROM applications ORDER BY created_at DESC')->fetchAll();
+$rows = $pdo->query("SELECT id, created_at, status, first_name_enc, last_name_enc, email_enc, position_enc, attachments_enc
+                       FROM applications
+                      WHERE pool_status != 'confirmed'
+                      ORDER BY created_at DESC")->fetchAll();
 
 $apps = [];
 foreach ($rows as $r) {
