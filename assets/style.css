@@ -400,6 +400,11 @@ dl.meta dd{margin:0;font-size:.95rem;overflow-wrap:anywhere}
 .content-page ul,.content-page ol{padding-left:1.4rem;line-height:1.6}
 .content-page a{color:var(--c-primary);text-decoration:underline}
 .content-page a:hover{color:var(--c-primary-dk)}
+.content-page address{font-style:normal;line-height:1.6;margin:.4rem 0 .8rem}
+.content-page hr{border:none;border-top:1px solid #e5e7eb;margin:1.5rem 0}
+.content-page .label{display:block;font-weight:600;color:var(--c-text-soft);margin-top:1rem;font-size:.95rem}
+.content-page table{border-collapse:collapse;width:100%;margin:.6rem 0}
+.content-page th,.content-page td{border:1px solid #e5e7eb;padding:.4rem .6rem;text-align:left}
 
 /* WYSIWYG-Editor */
 .editor-wrap{border:1px solid #d1d5db;border-radius:10px;background:#fff;overflow:hidden}

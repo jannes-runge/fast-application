@@ -32,7 +32,6 @@ if (!$page) { http_response_code(404); echo 'Nicht gefunden.'; exit; }
 <main class="container container-sm">
   <p class="breadcrumb"><a href="index.php">← Zur Bewerbung</a></p>
   <article class="card content-page">
-    <h1><?= e($page['title']) ?></h1>
     <?= $page['content_html'] /* bereits beim Speichern saniert */ ?>
   </article>
   <footer class="footer">

@@ -23,32 +23,24 @@ final class Pages {
 }
 
 /**
- * Erlaubt eine kleine HTML-Teilmenge (p, h2-h4, ul/ol/li, b/strong, i/em, a, br, blockquote).
- * Strippt alles andere und entfernt event-Handler / javascript: URLs.
+ * Großzügiger HTML-Sanitizer für eingeloggte Admins.
+ * Lässt fast alle Struktur-Tags (h1-h6, p, ul/ol/li, table, address, hr, span, div, a, ...) zu.
+ * Strippt aber gefährliche Inhalte: <script>/<style>/<iframe>/<object>/<embed>/<form>/<noscript>
+ * inkl. ihres Inhalts, alle on*-Eventhandler sowie javascript:/data:/vbscript:-URLs.
  */
 function sanitize_page_html(string $html): string {
-    $allowed = '<p><br><strong><em><b><i><u><h2><h3><h4><ul><ol><li><a><blockquote>';
-    $html = strip_tags($html, $allowed);
-    // Inline-Eventhandler entfernen
+    // Kommentare entfernen (können CSP-Bypass / Conditional-Comments enthalten)
+    $html = preg_replace('/<!--.*?-->/s', '', $html);
+    // Gefährliche Tags inkl. Inhalt killen
+    $html = preg_replace('#<(script|style|iframe|object|embed|form|noscript|template)\b[^>]*>.*?</\1\s*>#is', '', $html);
+    // Selbstschließende Varianten / unvollständige
+    $html = preg_replace('#<(script|style|iframe|object|embed|form|noscript|template)\b[^>]*/?\s*>#is', '', $html);
+    // Inline-Eventhandler (onclick=, onerror=, ...)
     $html = preg_replace('/\son[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $html);
-    // javascript:/data: URLs in href entschärfen
-    $html = preg_replace_callback(
-        '/<a\b([^>]*)>/i',
-        function ($m) {
-            $attrs = $m[1];
-            if (preg_match('/href\s*=\s*("([^"]*)"|\'([^\']*)\'|([^\s>]+))/i', $attrs, $hm)) {
-                $url = $hm[2] ?? $hm[3] ?? $hm[4] ?? '';
-                if (!preg_match('#^(https?://|mailto:|/|#)#i', $url)) {
-                    $attrs = preg_replace('/href\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', 'href="#"', $attrs);
-                }
-            }
-            // External-Sicherheit
-            if (preg_match('#href\s*=\s*["\']https?://#i', $attrs)) {
-                $attrs = preg_replace('/\s+(target|rel)\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $attrs);
-                $attrs .= ' target="_blank" rel="noopener noreferrer"';
-            }
-            return '<a' . $attrs . '>';
-        },
+    // javascript:/data:/vbscript: in href/src/action neutralisieren
+    $html = preg_replace(
+        '/\b(href|src|action|formaction)\s*=\s*("|\')\s*(javascript|data|vbscript)\s*:/i',
+        '$1=$2#blocked:',
         $html
     );
     return trim($html);

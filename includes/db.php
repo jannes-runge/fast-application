@@ -91,7 +91,8 @@ final class DB {
         $defaults = [
             'impressum' => [
                 'title' => 'Impressum',
-                'html'  => "<h2>Angaben gem&auml;&szlig; &sect; 5 TMG</h2>"
+                'html'  => "<h1>Impressum</h1>"
+                         . "<h2>Angaben gem&auml;&szlig; &sect; 5 TMG</h2>"
                          . "<p>[Firmenname]<br>[Stra&szlig;e Hausnummer]<br>[PLZ Ort]</p>"
                          . "<h2>Vertreten durch</h2><p>[Name der Gesch&auml;ftsf&uuml;hrung]</p>"
                          . "<h2>Kontakt</h2><p>Telefon: [Telefonnummer]<br>E-Mail: [E-Mail]</p>"
@@ -101,7 +102,8 @@ final class DB {
             ],
             'datenschutz' => [
                 'title' => 'Datenschutzerklärung',
-                'html'  => "<h2>1. Verantwortlicher</h2>"
+                'html'  => "<h1>Datenschutzerkl&auml;rung</h1>"
+                         . "<h2>1. Verantwortlicher</h2>"
                          . "<p>[Firmenname]<br>[Anschrift]<br>E-Mail: [E-Mail]</p>"
                          . "<h2>2. Erhebung und Verarbeitung personenbezogener Daten</h2>"
                          . "<p>Wenn du dich &uuml;ber das Bewerbungsformular bei uns bewirbst, verarbeiten wir die von dir &uuml;bermittelten Daten "
