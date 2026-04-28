@@ -75,6 +75,39 @@ final class DB {
         if (!in_array('status_changed_at', $names, true)) {
             self::$pdo->exec("ALTER TABLE applications ADD COLUMN status_changed_at INTEGER");
         }
+        // DSGVO / Bewerber-Pool
+        if (!in_array('pool_status', $names, true)) {
+            self::$pdo->exec("ALTER TABLE applications ADD COLUMN pool_status TEXT NOT NULL DEFAULT 'none'");
+        }
+        if (!in_array('pool_token', $names, true)) {
+            self::$pdo->exec("ALTER TABLE applications ADD COLUMN pool_token TEXT");
+        }
+        if (!in_array('pool_token_expires', $names, true)) {
+            self::$pdo->exec("ALTER TABLE applications ADD COLUMN pool_token_expires INTEGER");
+        }
+        if (!in_array('pool_invited_at', $names, true)) {
+            self::$pdo->exec("ALTER TABLE applications ADD COLUMN pool_invited_at INTEGER");
+        }
+        if (!in_array('pool_confirmed_at', $names, true)) {
+            self::$pdo->exec("ALTER TABLE applications ADD COLUMN pool_confirmed_at INTEGER");
+        }
+
+        // Audit-Log für DSGVO-Nachvollziehbarkeit
+        self::$pdo->exec(<<<SQL
+            CREATE TABLE IF NOT EXISTS audit_log (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                created_at INTEGER NOT NULL,
+                admin_id INTEGER,
+                admin_user TEXT,
+                action TEXT NOT NULL,
+                target_type TEXT,
+                target_id TEXT,
+                details TEXT,
+                ip_hash TEXT
+            );
+            CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_log(created_at DESC);
+            CREATE INDEX IF NOT EXISTS idx_audit_target ON audit_log(target_type, target_id);
+        SQL);
 
         // Tabelle für pflegbare Seiten (Impressum, Datenschutz, …)
         self::$pdo->exec(<<<SQL
@@ -141,4 +174,23 @@ final class AppStatus {
     public static function isValid(string $s): bool { return isset(self::ALL[$s]); }
     public static function label(string $s): string { return self::ALL[$s]['label'] ?? $s; }
     public static function cssClass(string $s): string { return self::ALL[$s]['class'] ?? ''; }
+}
+
+/**
+ * Bewerber-Pool: Status mit Label.
+ */
+final class PoolStatus {
+    public const NONE      = 'none';
+    public const PENDING   = 'pending';
+    public const CONFIRMED = 'confirmed';
+    public const DECLINED  = 'declined';
+
+    public const LABELS = [
+        self::NONE      => '–',
+        self::PENDING   => 'Einladung versendet',
+        self::CONFIRMED => 'Im Pool',
+        self::DECLINED  => 'Pool abgelehnt',
+    ];
+
+    public static function label(string $s): string { return self::LABELS[$s] ?? $s; }
 }

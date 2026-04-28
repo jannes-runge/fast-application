@@ -92,6 +92,46 @@ function mail_applicant_rejection(string $firstName, string $position): string {
         HTML);
 }
 
+function mail_pool_invitation(string $firstName, string $position, string $confirmUrl, string $declineUrl): string {
+    $fn = e($firstName); $pos = e($position);
+    $co = e(cfg('company_name', ''));
+    $primary = e(cfg('colors.primary', '#2563eb'));
+    $confirm = e($confirmUrl); $decline = e($declineUrl);
+    return mail_layout('Bewerber-Pool', <<<HTML
+        <h1 style="margin:0 0 12px;font-size:22px">Hallo {$fn},</h1>
+        <p>vielen Dank für deine Bewerbung als <strong>{$pos}</strong>. Aktuell konnten wir dir leider
+           keine konkrete Zusage geben – wir würden dich aber gerne in unseren <strong>Bewerber-Pool</strong>
+           aufnehmen, damit wir bei einer passenden Position direkt auf dich zukommen können.</p>
+        <p>Damit wir deine Daten zu diesem Zweck weiter speichern dürfen, brauchen wir kurz dein
+           ausdrückliches Einverständnis. Du kannst dieses jederzeit formlos widerrufen.</p>
+        <p style="text-align:center;margin:26px 0 6px">
+          <a href="{$confirm}"
+             style="display:inline-block;background:{$primary};color:#fff;text-decoration:none;
+                    padding:12px 22px;border-radius:8px;font-weight:600;font-size:15px">
+            Aufnahme in den Pool bestätigen
+          </a>
+        </p>
+        <p style="text-align:center;margin:8px 0 4px">
+          <a href="{$decline}" style="color:#64748b;font-size:13px">Nein, danke – Daten löschen</a>
+        </p>
+        <p style="margin-top:24px">Herzliche Grüße<br>dein Team von {$co}</p>
+        HTML);
+}
+
+function mail_pool_confirmed(string $firstName): string {
+    $fn = e($firstName);
+    $co = e(cfg('company_name', ''));
+    $m  = e(cfg('contact_email', ''));
+    return mail_layout('Im Pool', <<<HTML
+        <h1 style="margin:0 0 12px;font-size:22px">Danke, {$fn}!</h1>
+        <p>Du bist jetzt Teil unseres Bewerber-Pools. Sobald eine passende Position frei wird,
+           melden wir uns bei dir.</p>
+        <p>Du kannst deine Aufnahme jederzeit widerrufen – schreib dafür einfach kurz an
+           <a href="mailto:{$m}">{$m}</a>.</p>
+        <p style="margin-top:24px">Herzliche Grüße<br>dein Team von {$co}</p>
+        HTML);
+}
+
 function mail_applicant_accepted(string $firstName, string $position): string {
     $fn = e($firstName); $pos = e($position);
     $co = e(cfg('company_name', ''));

@@ -4,35 +4,47 @@ require __DIR__ . '/../includes/bootstrap.php';
 Auth::require();
 
 $pdo = DB::conn();
-$rows = $pdo->query('SELECT id, created_at, status, first_name_enc, last_name_enc, email_enc, position_enc, attachments_enc FROM applications ORDER BY created_at DESC')->fetchAll();
+
+// Pool-Mitglieder + ausstehende Einladungen
+$rows = $pdo->query(
+    "SELECT id, created_at, status, pool_status, pool_invited_at, pool_confirmed_at,
+            first_name_enc, last_name_enc, email_enc, position_enc
+       FROM applications
+      WHERE pool_status IN ('pending','confirmed')
+      ORDER BY pool_status DESC, COALESCE(pool_confirmed_at, pool_invited_at, created_at) DESC"
+)->fetchAll();
 
 $apps = [];
 foreach ($rows as $r) {
     try {
-        $attCount = 0;
-        if ($r['attachments_enc']) {
-            $meta = json_decode(Crypto::decrypt($r['attachments_enc']), true);
-            if (is_array($meta)) $attCount = count($meta);
-        }
         $apps[] = [
             'id'        => (int)$r['id'],
             'created'   => (int)$r['created_at'],
             'status'    => (string)($r['status'] ?? 'new'),
+            'pool'      => (string)$r['pool_status'],
+            'invited'   => (int)($r['pool_invited_at'] ?? 0),
+            'confirmed' => (int)($r['pool_confirmed_at'] ?? 0),
             'first'     => Crypto::decrypt($r['first_name_enc']),
             'last'      => Crypto::decrypt($r['last_name_enc']),
             'email'     => Crypto::decrypt($r['email_enc']),
             'position'  => Crypto::decrypt($r['position_enc']),
-            'att_count' => $attCount,
         ];
     } catch (Throwable $e) {
-        $apps[] = ['id'=>(int)$r['id'],'created'=>(int)$r['created_at'],'status'=>(string)($r['status'] ?? 'new'),'first'=>'?','last'=>'?','email'=>'?','position'=>'[Entschlüsselung fehlgeschlagen]','att_count'=>0];
+        $apps[] = [
+            'id'=>(int)$r['id'],'created'=>(int)$r['created_at'],
+            'status'=>(string)($r['status'] ?? 'new'),
+            'pool'=>(string)$r['pool_status'],
+            'invited'=>(int)($r['pool_invited_at'] ?? 0),
+            'confirmed'=>(int)($r['pool_confirmed_at'] ?? 0),
+            'first'=>'?','last'=>'?','email'=>'?','position'=>'[Entschlüsselung fehlgeschlagen]',
+        ];
     }
 }
 ?><!doctype html>
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>Admin · Bewerbungen</title>
+<title>Admin · Bewerber-Pool</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
@@ -53,66 +65,45 @@ foreach ($rows as $r) {
 </style>
 </head>
 <body>
-<?php $nav = 'apps'; include __DIR__ . '/_topbar.php'; ?>
+<?php $nav = 'pool'; include __DIR__ . '/_topbar.php'; ?>
 
 <main class="container container-wide">
-  <?php if (($_GET['msg'] ?? '') === 'deleted'): ?>
-    <div class="alert alert-success">Bewerbung wurde gelöscht.</div>
-  <?php endif ?>
-
-  <div class="page-header">
-    <h1>Bewerbungen <span class="badge"><?= count($apps) ?></span></h1>
-    <?php if ($apps): ?>
-      <div class="filter-bar">
-        <input type="search" id="filter" placeholder="Suchen (Name, Mail, Position)…" autocomplete="off">
-        <select id="filterStatus">
-          <option value="">Alle Status</option>
-          <?php foreach (AppStatus::ALL as $key => $info): ?>
-            <option value="<?= e($key) ?>"><?= e($info['label']) ?></option>
-          <?php endforeach ?>
-        </select>
-      </div>
-    <?php endif ?>
-  </div>
+  <h1>Bewerber-Pool <span class="badge"><?= count($apps) ?></span></h1>
+  <p class="muted">Bewerber:innen, die der dauerhaften Speicherung ihrer Daten ausdrücklich zugestimmt haben (oder eine Einladung dazu erhalten haben). Pool-Bestätigte sind von der automatischen Löschung ausgenommen.</p>
 
   <?php if (!$apps): ?>
-    <div class="card"><p class="muted">Noch keine Bewerbungen eingegangen.</p></div>
+    <div class="card"><p class="muted">Aktuell sind keine Bewerber im Pool.</p></div>
   <?php else: ?>
-    <div class="card table-wrap" id="appList">
+    <div class="card table-wrap">
       <table class="tbl tbl-cards tbl-apps">
         <thead>
           <tr>
-            <th>Eingang</th>
+            <th>Pool-Status</th>
             <th>Name</th>
             <th>E-Mail</th>
             <th>Position</th>
-            <th>Status</th>
-            <th>Anhänge</th>
+            <th>Seit / eingeladen</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-        <?php foreach ($apps as $a): ?>
-          <?php $search = mb_strtolower($a['first'].' '.$a['last'].' '.$a['email'].' '.$a['position'], 'UTF-8'); ?>
-          <tr data-search="<?= e($search) ?>"
-              data-status="<?= e($a['status']) ?>"
-              data-href="view.php?id=<?= $a['id'] ?>">
-            <td data-col="date" data-label="Eingang"><?= e(date('d.m.Y H:i', $a['created'])) ?></td>
+        <?php foreach ($apps as $a):
+            $ts = $a['pool'] === 'confirmed' ? $a['confirmed'] : $a['invited'];
+        ?>
+          <tr data-href="view.php?id=<?= $a['id'] ?>">
+            <td data-col="status" data-label="Pool"><span class="status-badge st-pool-<?= e($a['pool']) ?>"><?= e(PoolStatus::label($a['pool'])) ?></span></td>
             <td data-col="name" data-label="Name"><strong><?= e($a['first'] . ' ' . $a['last']) ?></strong></td>
             <td data-col="email" data-label="E-Mail"><a href="mailto:<?= e($a['email']) ?>"><?= e($a['email']) ?></a></td>
             <td data-col="position" data-label="Position"><?= e($a['position']) ?></td>
-            <td data-col="status" data-label="Status"><span class="status-badge <?= e(AppStatus::cssClass($a['status'])) ?>"><?= e(AppStatus::label($a['status'])) ?></span></td>
-            <td data-col="att" data-label="Anhänge"><?= $a['att_count'] ?></td>
+            <td data-col="date" data-label="Datum"><?= $ts ? e(date('d.m.Y', $ts)) : '–' ?></td>
             <td data-col="action" data-label=""><a class="btn btn-sm btn-primary" href="view.php?id=<?= $a['id'] ?>">Öffnen</a></td>
           </tr>
         <?php endforeach ?>
         </tbody>
       </table>
-      <p class="muted empty-hint row-hidden" id="emptyHint">Keine Treffer.</p>
     </div>
   <?php endif ?>
 </main>
-
 <script src="../assets/admin.js" defer></script>
 </body>
 </html>

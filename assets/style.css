@@ -186,6 +186,11 @@ code{background:var(--c-bg-soft);padding:2px 6px;border-radius:4px;font-size:.9e
 .st-contacted {background:#dbeafe;color:#1e40af;border-color:#bfdbfe}
 .st-accepted  {background:#d1fae5;color:#065f46;border-color:#a7f3d0}
 .st-rejected  {background:#fee2e2;color:#991b1b;border-color:#fecaca}
+.st-pool-pending   {background:#fef3c7;color:#92400e;border-color:#fde68a}
+.st-pool-confirmed {background:#ede9fe;color:#5b21b6;border-color:#ddd6fe}
+.st-pool-declined  {background:#f1f5f9;color:#475569;border-color:#e2e8f0}
+
+.audit-details{display:inline-block;max-width:30rem;font-size:.78rem;color:#475569;background:#f1f5f9;border-radius:6px;padding:2px 8px;white-space:pre-wrap;word-break:break-word}
 
 .status-actions{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
 .status-actions form{margin:0}

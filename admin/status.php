@@ -28,6 +28,10 @@ $old = (string)$row['status'];
 try {
     $upd = $pdo->prepare('UPDATE applications SET status = ?, status_changed_at = ? WHERE id = ?');
     $upd->execute([$status, time(), $id]);
+    Audit::log('application.status_change', 'application', (string)$id, [
+        'from' => $old,
+        'to'   => $status,
+    ]);
 } catch (Throwable $e) {
     error_log('[status] ' . $e->getMessage());
     http_response_code(500); exit('Fehler beim Speichern.');

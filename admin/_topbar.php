@@ -1,5 +1,5 @@
 <?php
-// Erwartet $nav: 'apps' | 'pages' | 'admins'
+// Erwartet $nav: 'apps' | 'pool' | 'pages' | 'admins' | 'audit'
 $nav = $nav ?? 'apps';
 ?>
 <header class="topbar">
@@ -11,8 +11,10 @@ $nav = $nav ?? 'apps';
     <span class="spacer"></span>
     <nav class="topbar-nav">
       <a href="index.php" class="<?= $nav === 'apps' ? 'active' : '' ?>">Bewerbungen</a>
+      <a href="pool.php" class="<?= $nav === 'pool' ? 'active' : '' ?>">Pool</a>
       <a href="pages.php" class="<?= $nav === 'pages' ? 'active' : '' ?>">Inhalte</a>
       <a href="admins.php" class="<?= $nav === 'admins' ? 'active' : '' ?>">Admins</a>
+      <a href="audit.php" class="<?= $nav === 'audit' ? 'active' : '' ?>">Audit</a>
       <a href="logout.php" class="logout">Abmelden</a>
     </nav>
   </div>

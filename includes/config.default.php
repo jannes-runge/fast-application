@@ -71,4 +71,16 @@ return [
         'login_lockout_min'   => 15,
         'session_lifetime'    => 3600,
     ],
+
+    // ---------- DSGVO / Aufbewahrung ----------
+    'gdpr' => [
+        // Anzahl Tage, die Bewerbungsdaten maximal gespeichert bleiben.
+        // Bewerbungen, die im Bewerber-Pool bestätigt sind, sind ausgenommen.
+        'retention_days'        => 180,
+        // Wie lange ein Pool-Opt-In-Link gültig ist (Tage).
+        'pool_invite_ttl_days'  => 14,
+        // Token, mit dem das Cleanup-Skript per Web ausgelöst werden darf
+        // (https://…/cleanup.php?token=…). Per CLI ist kein Token nötig.
+        'cleanup_token'         => '',
+    ],
 ];

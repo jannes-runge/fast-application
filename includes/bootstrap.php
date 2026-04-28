@@ -145,9 +145,11 @@ if (isset($_SESSION['admin_id'])) {
 require_once INCLUDES_PATH . '/crypto.php';
 require_once INCLUDES_PATH . '/db.php';
 require_once INCLUDES_PATH . '/auth.php';
+require_once INCLUDES_PATH . '/audit.php';
 require_once INCLUDES_PATH . '/mailer.php';
 require_once INCLUDES_PATH . '/mailtemplates.php';
 require_once INCLUDES_PATH . '/pages.php';
+require_once INCLUDES_PATH . '/applications.php';
 
 /**
  * HTML-Escape Shortcut.

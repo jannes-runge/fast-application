@@ -29,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $hash = password_hash($p, PASSWORD_BCRYPT);
                     $ins = $pdo->prepare('INSERT INTO admins (username, password_hash, created_at) VALUES (?,?,?)');
                     $ins->execute([$u, $hash, time()]);
+                    Audit::log('admin.create', 'admin', (string)$pdo->lastInsertId(), ['username' => $u]);
                     $notice = 'Admin "' . $u . '" wurde angelegt.';
                 }
             }
@@ -42,8 +43,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } elseif ($count <= 1) {
                 $errors[] = 'Der letzte Admin kann nicht gelöscht werden.';
             } else {
+                $userRow = $pdo->prepare('SELECT username FROM admins WHERE id = ?');
+                $userRow->execute([$delId]);
+                $delUsername = (string)($userRow->fetchColumn() ?: '');
                 $del = $pdo->prepare('DELETE FROM admins WHERE id = ?');
                 $del->execute([$delId]);
+                Audit::log('admin.delete', 'admin', (string)$delId, ['username' => $delUsername]);
                 $notice = 'Admin gelöscht.';
             }
         }

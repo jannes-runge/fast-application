@@ -34,16 +34,21 @@ final class Auth {
         $ok = $row && password_verify($password, $row['password_hash']);
         self::recordLoginAttempt($username, $ok);
 
-        if (!$ok) return false;
+        if (!$ok) {
+            Audit::log('login.failed', null, null, ['username' => $username]);
+            return false;
+        }
 
         session_regenerate_id(true);
         $_SESSION['admin_id'] = (int)$row['id'];
         $_SESSION['admin_user'] = $row['username'];
         $_SESSION['last_activity'] = time();
+        Audit::log('login.success');
         return true;
     }
 
     public static function logout(): void {
+        Audit::log('logout');
         $_SESSION = [];
         if (ini_get('session.use_cookies')) {
             $p = session_get_cookie_params();

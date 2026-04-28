@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mb_strlen($html) > 100000)  $errors[] = 'Inhalt zu groß (max. 100k Zeichen).';
         if (!$errors) {
             Pages::save($slug, $title, sanitize_page_html($html));
+            Audit::log('page.update', 'page', $slug, ['title' => $title, 'length' => mb_strlen($html)]);
             $notice = 'Gespeichert.';
         }
     }
