@@ -147,6 +147,7 @@ require_once INCLUDES_PATH . '/db.php';
 require_once INCLUDES_PATH . '/auth.php';
 require_once INCLUDES_PATH . '/mailer.php';
 require_once INCLUDES_PATH . '/mailtemplates.php';
+require_once INCLUDES_PATH . '/pages.php';
 
 /**
  * HTML-Escape Shortcut.

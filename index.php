@@ -262,7 +262,11 @@ $title = cfg('app_name', 'Bewerbung');
   <?php endif ?>
 
   <footer class="footer">
-    <small>© <?= date('Y') ?> <?= e(cfg('company_name')) ?> · <a href="mailto:<?= e(cfg('contact_email')) ?>"><?= e(cfg('contact_email')) ?></a></small>
+    <small>© <?= date('Y') ?> <?= e(cfg('company_name')) ?> ·
+      <a href="mailto:<?= e(cfg('contact_email')) ?>"><?= e(cfg('contact_email')) ?></a> ·
+      <a href="impressum.php">Impressum</a> ·
+      <a href="datenschutz.php">Datenschutz</a>
+    </small>
   </footer>
 </main>
 
