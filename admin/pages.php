@@ -111,6 +111,8 @@ $pages = Pages::all();
               <span class="sep"></span>
               <button type="button" data-cmd="undo" title="Rückgängig">↶</button>
               <button type="button" data-cmd="redo" title="Wiederholen">↷</button>
+              <span class="sep"></span>
+              <button type="button" data-cmd="toggleHtml" title="HTML-Quelltext bearbeiten" class="toggle-html">&lt; &gt; HTML</button>
             </div>
             <div class="editor" id="editor" contenteditable="true" spellcheck="true" lang="de"></div>
             <textarea name="content_html" id="content_html" hidden><?= e($page['content_html']) ?></textarea>

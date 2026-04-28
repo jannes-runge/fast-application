@@ -415,3 +415,10 @@ dl.meta dd{margin:0;font-size:.95rem;overflow-wrap:anywhere}
 .editor p{margin:.5rem 0}
 .editor ul,.editor ol{padding-left:1.4rem;margin:.5rem 0}
 .editor a{color:var(--c-primary);text-decoration:underline}
+.editor-html{display:block;width:100%;min-height:340px;padding:1rem 1.1rem;border:none;outline:none;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:.88rem;line-height:1.5;resize:vertical;background:#fff}
+.editor-html:focus{box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--c-primary) 25%, transparent)}
+.editor-toolbar button[disabled]{opacity:.4;cursor:not-allowed}
+.editor-toolbar button.toggle-html.active,
+.editor-toolbar button.toggle-html:not([disabled]):hover{background:#fff;border-color:#d1d5db}
+.editor-toolbar button.toggle-html.active{background:var(--c-primary);color:#fff;border-color:var(--c-primary)}
